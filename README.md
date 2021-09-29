@@ -1,3 +1,11 @@
+# nexrad-gtk
+
+NEXRAD radar visualizer using gtk and opengl
+
+# Building
+
+    go build
+
 # Resources
 
 ## Giants
