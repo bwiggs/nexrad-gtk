@@ -49,15 +49,15 @@ func realize(glarea *gtk.GLArea) {
 	log.Println("realize")
 
 	shapeFiles := []string{
-		"data/cb_2018_us_nation_20m/cb_2018_us_nation_20m.shp",
-		"data/cb_2018_us_state_20m/cb_2018_us_state_20m.shp",
+		"data/shapefiles/cb_2018_us_nation_20m/cb_2018_us_nation_20m.shp",
+		"data/shapefiles/cb_2018_us_state_20m/cb_2018_us_state_20m.shp",
 	}
 	shapes := loadShapeFiles(shapeFiles)
 	// spew.Dump(shapes)
 	_ = shapes
 
-	states = loadStates("data/cb_2018_us_state_20m/cb_2018_us_state_20m.shp")
-	// states = loadStates("data/cb_2018_us_state_500k/cb_2018_us_state_500k.shp")
+	states = loadStates("data/shapefiles/cb_2018_us_state_20m/cb_2018_us_state_20m.shp")
+	// states = loadStates("data/shapefiles/cb_2018_us_state_500k/cb_2018_us_state_500k.shp")
 	txp := states["TX"].(*shp.Polygon)
 	texas = NewStatePolygon(txp)
 	// texas = NewStatePolygonMerc(txp)
