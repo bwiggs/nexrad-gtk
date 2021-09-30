@@ -8,7 +8,6 @@ import (
 	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
-	"github.com/jonas-p/go-shp"
 )
 
 const (
@@ -47,20 +46,6 @@ var (
 
 func realize(glarea *gtk.GLArea) {
 	log.Println("realize")
-
-	shapeFiles := []string{
-		"data/shapefiles/cb_2018_us_nation_20m/cb_2018_us_nation_20m.shp",
-		"data/shapefiles/cb_2018_us_state_20m/cb_2018_us_state_20m.shp",
-	}
-	shapes := loadShapeFiles(shapeFiles)
-	// spew.Dump(shapes)
-	_ = shapes
-
-	states = loadStates("data/shapefiles/cb_2018_us_state_20m/cb_2018_us_state_20m.shp")
-	// states = loadStates("data/shapefiles/cb_2018_us_state_500k/cb_2018_us_state_500k.shp")
-	txp := states["TX"].(*shp.Polygon)
-	texas = NewStatePolygon(txp)
-	// texas = NewStatePolygonMerc(txp)
 
 	// Make the the GLArea's GdkGLContext the current OpenGL context.
 	glarea.MakeCurrent()
@@ -199,8 +184,24 @@ func onButtonPress(widget *gtk.GLArea, ev *gdk.Event) bool {
 	return true
 }
 
-func onKeyPress(widget *gtk.GLArea, ev *gdk.Event) bool {
-	log.Println(ev)
+func onKeyPress(widget *gtk.GLArea, e *gdk.Event) bool {
+	ev := gdk.EventKey{Event: e}
+	switch ev.KeyVal() {
+	case gdk.KEY_Left:
+		camX -= scrollInc
+	case gdk.KEY_Right:
+		camX += scrollInc
+	case gdk.KEY_Up:
+		camY += scrollInc
+	case gdk.KEY_Down:
+		camY -= scrollInc
+	case gdk.KEY_r:
+		resetCamera()
+	case gdk.KEY_Escape:
+		application.Quit()
+	default:
+		log.Println("unknown: ", ev.KeyVal())
+	}
 	return true
 }
 
@@ -216,9 +217,22 @@ func onScroll(widget *gtk.GLArea, e *gdk.Event) bool {
 		camZ -= scrollInc
 	}
 
-	if camZ <= 0 {
-		camZ = 0
-	}
+	camZ = f32Constrain(camZ, 10.0, 400.0)
 
 	return true
+}
+
+func f32Constrain(x, min, max float32) float32 {
+	if x < min {
+		return min
+	} else if x > max {
+		return max
+	}
+	return x
+}
+
+func resetCamera() {
+	camX = 0
+	camY = 0
+	camZ = 300
 }

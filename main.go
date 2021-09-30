@@ -14,15 +14,25 @@ import (
 const appId = "com.github.gotk3.gotk3-examples.glade"
 
 var states = map[string]shp.Shape{}
+var shapeFiles = []string{
+	// "data/shapefiles/cb_2018_us_nation_20m/cb_2018_us_nation_20m.shp",
+	// "data/shapefiles/cb_2018_us_state_20m/cb_2018_us_state_20m.shp",
+	"data/shapefiles/tl_2020_us_primaryroads/tl_2020_us_primaryroads.shp",
+}
+var shapes = []*shp.Shape{}
+var application *gtk.Application
 
 func main() {
-	// Create a new application.
-	application, err := gtk.ApplicationNew(appId, glib.APPLICATION_FLAGS_NONE)
+	// Create a new application
+	var err error
+	application, err = gtk.ApplicationNew(appId, glib.APPLICATION_FLAGS_NONE)
 	errorCheck(err)
 
 	// Connect function to application startup event, this is not required.
 	application.Connect("startup", func() {
 		log.Println("application startup")
+
+		initData()
 	})
 
 	// Connect function to application activate event
@@ -88,7 +98,7 @@ func isGLArea(obj glib.IObject) (*gtk.GLArea, error) {
 	if win, ok := obj.(*gtk.GLArea); ok {
 		return win, nil
 	}
-	return nil, errors.New("not a *gtk.Window")
+	return nil, errors.New("not a *gtk.GLArea")
 }
 
 func errorCheck(e error) {
@@ -103,4 +113,16 @@ func errorCheck(e error) {
 // and is here to simply demo how to hook-up custom callbacks.
 func onMainWindowDestroy() {
 	log.Println("onMainWindowDestroy")
+}
+
+func initData() {
+	log.Println("loading data files")
+	shapes = loadShapeFiles(shapeFiles)
+
+	states = loadStates("data/shapefiles/cb_2018_us_state_20m/cb_2018_us_state_20m.shp")
+	// states = loadStates("data/shapefiles/cb_2018_us_state_500k/cb_2018_us_state_500k.shp")
+
+	txp := states["TX"].(*shp.Polygon)
+	texas = NewStatePolygon(txp)
+	// texas = NewStatePolygonMerc(txp)
 }

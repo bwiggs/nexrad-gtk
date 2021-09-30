@@ -65,37 +65,6 @@ func NewStatePolygon(p *shp.Polygon) StatePolygon {
 	return sp
 }
 
-func NewStatePolygon2(p *shp.Polygon) StatePolygon {
-	sp := StatePolygon{attributes: 2, numVerts: 4}
-
-	sp.data = []float32{
-		-1.0, +1.0, 0.0,
-		1.0, 0.0, 0.0,
-
-		1.0, 1.0, 0.0,
-		float32(statesStrokeColor.R), float32(statesStrokeColor.G), float32(statesStrokeColor.B),
-
-		1.0, -1.0, 0.0,
-		0.0, 0.0, 1.0,
-
-		-1.0, -1.0, 0.0,
-		float32(statesStrokeColor.R), float32(statesStrokeColor.G), float32(statesStrokeColor.B),
-
-		// -1.0, 1.0, 0.0,
-		// 1.0, 0.0, 0.0,
-	}
-	// for _, pt := range p.Points {
-	// 	x, y, z := geo1.ToECEF(pt.X, pt.Y, 1)
-	// 	sp.data = append(sp.data,
-	// 		// x, y, z
-	// 		float32(x), float32(y), float32(z),
-	// 		// r, g, b
-	// 		+1.0, +0.0, +0.0,
-	// 	)
-	// }
-	return sp
-}
-
 func (s *StatePolygon) Draw() {
 	// Load the shader program into the rendering pipeline.
 	gl.UseProgram(program)
@@ -143,7 +112,7 @@ func (s *StatePolygon) mvp() {
 	// Get 4x4 projection matrix with a 60 degree field of view, an aspect ratio
 	// of the window dimensions, near clipping plane, and a far clipping plane.
 	projection := mgl32.Perspective(
-		mgl32.DegToRad(45.0), float32(winWidth/winHeight), 0.1, -1.0,
+		mgl32.DegToRad(90.0), float32(winWidth/winHeight), 0.1, -1.0,
 	)
 	// Set the handle to point to the address of the projection matrix.
 	gl.UniformMatrix4fv(projectionIndex, 1, false, &projection[0])
@@ -152,7 +121,7 @@ func (s *StatePolygon) mvp() {
 	// and the up direction with a positive bias in the y-axis.
 	// Right-handed coordinate system.
 	view := mgl32.LookAtV(
-		mgl32.Vec3{camX, camY, camZ}, mgl32.Vec3{0, 0, 0}, mgl32.Vec3{0, 1, 0},
+		mgl32.Vec3{0, 0, camZ}, mgl32.Vec3{camX, camY, 0}, mgl32.Vec3{0, 1, 0},
 	)
 	// Set the handle to point to the address of the view matrix.
 	gl.UniformMatrix4fv(viewIndex, 1, false, &view[0])
@@ -200,10 +169,18 @@ func loadShapeFiles(files []string) (shapes []*shp.Shape) {
 		}
 		defer shape.Close()
 
+		// fields := shape.Fields()
+
 		// loop through all features in the shapefile
 		for shape.Next() {
 			_, p := shape.Shape()
+			// log.Println(reflect.TypeOf(p).Elem(), p.BBox())
+
 			shapes = append(shapes, &p)
+			// for k, f := range fields {
+			// 	val := shape.ReadAttribute(n, k)
+			// 	log.Printf("\t%v: %v\n", f, val)
+			// }
 		}
 	}
 

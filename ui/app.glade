@@ -27,13 +27,13 @@
             <signal name="key-press-event" handler="onKeyPress" swapped="no"/>
             <!-- <signal name="button-release-event" handler="onButtonRelease" swapped="no"/>
             <signal name="motion-notify-event" handler="onDragMotion" swapped="no"/> -->
-            <signal name="scroll-event" handler="onScroll" object="main_window" swapped="no"/>
+            <signal name="scroll-event" handler="onScroll" swapped="no"/>
 
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can_focus">True</property>
             <property name="hexpand">True</property>
             <property name="vexpand">True</property>
-          </object>S
+          </object>
         </child>
       </object>
     </child>
